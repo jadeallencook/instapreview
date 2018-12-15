@@ -1,6 +1,6 @@
 {
-  "name": "InstaPreview",
-  "version": "0.0.1",
+  "name": "Post Previewer",
+  "version": "0.0.2",
   "manifest_version": 2,
   "description": "Preview your Instagram post before you publish it on your feed!",
   "homepage_url": "http://jadeallencook.com/",

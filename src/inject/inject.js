@@ -6,8 +6,8 @@ chrome.extension.sendMessage({}, function (response) {
 			// clear loop once page is loaded
 			clearInterval(readyStateCheckInterval);
 			// cache build elements
-			const postElems = document.getElementsByClassName('KL4Bh'),
-				btnContainerElem = document.querySelector('.fx7hk');
+			const postElems = document.getElementsByClassName('KL4Bh');
+			let btnContainerElem = document.querySelector('.fx7hk');
 			// cache build vars 
 			let postImages = [];
 			// get all existing post images
@@ -15,18 +15,42 @@ chrome.extension.sendMessage({}, function (response) {
 				imgSrc = post.childNodes[0].getAttribute('src');
 				postImages.push(imgSrc);
 			}
-			// add preview btn
-			previewBtnHTML = '<a class="_t7nuu" id="preview-btn"><input type="file" id="preview-image"></a>';
-			btnContainerElem.innerHTML += previewBtnHTML;
-			// event listener for preview btn 
-			document.getElementById('preview-image').addEventListener('change', function () {
-				var file = this.files[0];
-				var reader = new FileReader();
-				reader.onloadend = function () {
-					insertImage(reader.result);
+			// attach btn to insta ui
+			function attachBtn() {
+				// add preview btn
+				btnContainerElem.innerHTML += `
+					<a class="_9VEo1" id="preview-btn">
+						<input type="file" id="preview-image" style="display: none">
+						<label for="preview-image" style="cursor: pointer; margin-left: 5px; color: #6dc993;">PREVIEW</label>
+					</a>
+				`;
+				// event listener for preview btn 
+				document.getElementById('preview-image').addEventListener('change', function () {
+					var file = this.files[0];
+					var reader = new FileReader();
+					reader.onloadend = function () {
+						insertImage(reader.result);
+					}
+					if (file) reader.readAsDataURL(file);
+				});
+			}
+			if (btnContainerElem) attachBtn();
+			document.onclick = function () {
+				btnContainerElem = document.querySelector('.fx7hk');
+				let previewImageBtn = document.getElementById('preview-image');
+				if (btnContainerElem && !previewImageBtn) {
+					attachBtn();
+				} else {
+					let x = 0;
+					let retry = setInterval(function () {
+						x++;
+						btnContainerElem = document.querySelector('.fx7hk');
+						let previewImageBtn = document.getElementById('preview-image');
+						if (x === 30 || previewImageBtn) clearInterval(retry);
+						else if (btnContainerElem && !previewImageBtn) attachBtn();
+					}, 50);
 				}
-				if (file) reader.readAsDataURL(file);
-			});
+			}
 			// place image into current layout
 			function insertImage(image) {
 				// loop over each post in feed
