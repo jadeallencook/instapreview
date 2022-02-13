@@ -1,0 +1,19 @@
+label#insta-label {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    color: #fff;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #8a3ab9;
+}
+
+label#insta-label:hover {
+    opacity: 0.5;
+}
+
+input#insta-file {
+    display: none;
+}

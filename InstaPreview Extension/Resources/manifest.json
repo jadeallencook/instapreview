@@ -1,0 +1,23 @@
+{
+    "manifest_version": 2,
+    "default_locale": "en",
+
+    "name": "InstaPreview",
+    "description": "Instantly preview your Instagram posts!",
+    "version": "1.0",
+
+    "icons": {
+        "48": "images/icon-16.png",
+        "96": "images/icon-19.png",
+        "128": "images/icon-48.png",
+        "256": "images/icon-128.png",
+    },
+
+    "content_scripts": [{
+        "js": [ "content.js" ],
+        "css": ["style.css"],
+        "matches": [ "*://www.instagram.com/*" ]
+    }],
+
+    "permissions": [ ]
+}
