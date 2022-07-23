@@ -1,56 +1,59 @@
-/*
- InstaPreview (Copyright 2020-2022)
- Developed by @jadeallencook
-*/
-
-function isProfile() {
-    const profile = window.location.href.split('/')[3];
-    const array = ['explore', 'direct', 'p'];
-    return (profile && array.indexOf(profile) === -1);
-}
-
-function render(file) {
-    if (isProfile()) {
-        const article = document.querySelector('article');
-        const rows = document.querySelectorAll('article > div > div > div');
-        const posts = document.querySelectorAll('article > div > div > div > div');
-        const preview = posts[0].cloneNode(true);
-        const element = document.getElementById('insta-preview');
-        const image = element ? element : preview.querySelector('img');
-        let last;
-        image.setAttribute('src', file);
-        image.setAttribute('srcset', file);
-        if (!element) {
-            image.id = 'insta-preview';
-            rows[0].prepend(preview);
-            for (let row of [...rows]) {
-                if (last) row.prepend(last);
-                const node = row.children[3];
-                node.remove();
-                last = node.cloneNode(true);
-            }
-        }
-    } else {
-        alert('You must be on a profile to preview a post.');
+(() => {
+  const insert = (type, result) => {
+    const rows = document.querySelectorAll("div._ac7v");
+    let images;
+    let clone = document.querySelector("div._ac7v > div._aabd").cloneNode();
+    update(type, result, clone);
+    for (let row of rows) {
+      row.prepend(clone);
+      images = row.querySelectorAll("div._aabd");
+      clone = images[images.length - 1];
+      clone.remove();
     }
-}
+    hasPreview = true;
+  };
 
-function handler(event) {
-    const file = event.target.files[0];
+  const update = (
+    type,
+    result,
+    elem = document.querySelector("div._ac7v > div._aabd")
+  ) => {
+    const base64 = `data:${type};base64,${btoa(result)}`;
+    elem.innerHTML = "";
+    elem.style.background = `url(${base64})`;
+    elem.style.backgroundPosition = "center center";
+    elem.style.backgroundSize = "cover";
+  };
+
+  const handler = (event) => {
+    const { files } = event.srcElement;
+    const file = files[0];
     const reader = new FileReader();
-    reader.onloadend = () => render(reader.result);
-    if (file) reader.readAsDataURL(file);
-}
+    reader.readAsBinaryString(file);
+    reader.onload = (event) =>
+      hasPreview
+        ? update(file.type, event.target.result)
+        : insert(file.type, event.target.result);
+  };
 
-(function() {
-    const file = document.createElement('input');
-    const label = document.createElement('label');
-    file.type = 'file';
-    file.id = 'insta-file';
-    file.addEventListener('change', handler);
-    label.id = 'insta-label';
-    label.innerText = '📸';
-    label.setAttribute('for', 'insta-file');
-    document.body.appendChild(file);
-    document.body.appendChild(label);
+  const load = () => {
+    const menu = document.querySelector("div._aa-g._ac_s");
+    if (menu) {
+      const tab = document.createElement("input");
+      tab.setAttribute("type", "file");
+      tab.onchange = handler;
+      menu.appendChild(tab);
+      loaded = true;
+    }
+    if (attempts === 10 || loaded) {
+      clearInterval(interval);
+    } else {
+      attempts++;
+    }
+  };
+
+  let loaded = false;
+  let attempts = 0;
+  let hasPreview = false;
+  const interval = setInterval(load, 500);
 })();
